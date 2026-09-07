@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  password     String
+  name         String
+  role         String         @default("QA Lead")
+  phone        String?
+  organization String         @default("Acme QA Engineering")
+  avatar       String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  projects     Project[]
+  notifications Notification[]
+}
+
+model Project {
+  id                 String              @id @default(cuid())
+  userId             String
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String
+  type               String              @default("Full Stack Application")
+  loc                Int                 @default(12500)
+  testCases          Int                 @default(420)
+  coverage           Float               @default(85.0)
+  automationPercent  Float               @default(35.0)
+  complexity         String              @default("Medium") // Low, Medium, High
+  environments       Int                 @default(1)
+  apiCount           Int                 @default(12)
+  estimatedHours     Float               @default(152.0)
+  personDays         Float               @default(19.0)
+  personWeeks        Float               @default(3.8)
+  status             String              @default("Active") // Active, In Review, Completed, Planning
+  description        String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  estimations        Estimation[]
+  testCaseItems      TestCase[]
+  reports            Report[]
+  history            EstimationHistory[]
+}
+
+model Estimation {
+  id                   String   @id @default(cuid())
+  projectId            String?
+  project              Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectName          String
+  loc                  Int
+  testCases            Int
+  coverage             Float
+  automationPercent    Float    @default(30.0)
+  complexity           String   @default("Medium")
+  environments         Int      @default(1)
+  apiCount             Int      @default(0)
+  
+  locEffort            Float
+  testCaseEffort       Float
+  coverageMultiplier   Float
+  complexityMultiplier Float
+  envMultiplier        Float
+  
+  totalHours           Float
+  personDays           Float
+  personWeeks          Float
+  recommendedTeam      String   // JSON string of team composition
+  breakdown            String   // JSON string of effort distribution
+  notes                String?
+  createdAt            DateTime @default(now())
+}
+
+model TestCase {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testId      String   // e.g. TC-101
+  title       String
+  module      String   // e.g. Authentication, Checkout, API, Reporting
+  priority    String   @default("P2") // P1, P2, P3
+  type        String   @default("Manual") // Manual, Automated, Regression
+  status      String   @default("Passed") // Passed, Failed, Blocked, Not Run
+  assignedTo  String?
+  steps       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TeamMember {
+  id               String   @id @default(cuid())
+  name             String
+  role             String   // QA Lead, QA Engineer, Automation Engineer, Manual Tester
+  experience       String   // e.g. "5+ Years", "Senior"
+  availability     String   @default("Available") // Available, Busy, On Leave
+  capacity         Int      @default(100) // Percentage 0 - 100
+  email            String   @unique
+  phone            String?
+  assignedProjects String?  // JSON string or comma-separated names
+  avatar           String?
+  createdAt        DateTime @default(now())
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reportType  String   // Estimation Report, Project QA Report, Coverage Report, Team Utilization
+  title       String
+  summary     String
+  data        String   // JSON payload of the report
+  createdAt   DateTime @default(now())
+}
+
+model EstimationHistory {
+  id             String   @id @default(cuid())
+  projectId      String?
+  project        Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectName    String
+  loc            Int
+  testCases      Int
+  coverage       Float
+  complexity     String
+  environments   Int      @default(1)
+  estimatedHours Float
+  createdAt      DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("info") // info, success, warning, alert
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  id                  String   @id @default("global-config")
+  locRate             Float    @default(6.4)    // Hours per 1,000 LOC
+  testCaseRate        Float    @default(0.125)  // Hours per test case
+  baselineCoverage    Float    @default(70.0)   // Baseline coverage percentage
+  lowMultiplier       Float    @default(0.85)
+  medMultiplier       Float    @default(1.00)
+  highMultiplier      Float    @default(1.25)
+  env1Multiplier      Float    @default(1.00)
+  env2Multiplier      Float    @default(1.10)
+  env3Multiplier      Float    @default(1.20)
+  workingHoursPerDay  Float    @default(8.0)
+  workingDaysPerWeek  Float    @default(5.0)
+  updatedAt           DateTime @updatedAt
+}

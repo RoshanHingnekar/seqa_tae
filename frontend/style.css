@@ -1,0 +1,1006 @@
+/* ==========================================================================
+   SOFTWARE TESTING RESOURCE ESTIMATOR - DESIGN SYSTEM
+   THEME: LIGHT RETRO COMPUTER / EARLY DIGITAL (VINTAGE WORKSTATION)
+   ========================================================================== */
+
+:root {
+  /* Surface & Base Palette */
+  --bg-cream: #F5F2EA;
+  --bg-canvas: #EDE8DE;
+  --panel-bg: #FCFBF7;
+  --panel-bezel: #E5DFC8;
+  --panel-inset: #F4EFE3;
+  --panel-highlight: #FFFFFF;
+  
+  /* Text & Contrast */
+  --text-main: #1D232A;
+  --text-muted: #535E6D;
+  --text-sub: #7A8593;
+  --border-light: #D6CEBE;
+  --border-dark: #AFA694;
+  --border-focus: #0D9488;
+  
+  /* Vintage Hardware Accent Tones */
+  --retro-amber: #D97706;
+  --retro-amber-light: #FEF3C7;
+  --retro-teal: #0F766E;
+  --retro-teal-light: #CCFBF1;
+  --retro-blue: #1D4ED8;
+  --retro-blue-light: #DBEAFE;
+  --retro-rose: #BE123C;
+  --retro-rose-light: #FFE4E6;
+  --retro-purple: #6D28D9;
+  --retro-purple-light: #EDE9FE;
+  --retro-green: #15803D;
+  
+  /* Monospace & Readability Fonts */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Mono', 'Courier New', Courier, monospace;
+  --font-digital: 'VT323', monospace;
+  
+  /* Radii & Shadows (Tactile Retro Computer) */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --shadow-retro: 2px 2px 0px var(--border-dark);
+  --shadow-retro-pressed: 0px 0px 0px var(--border-dark);
+  --shadow-panel: 0 4px 12px rgba(30, 35, 42, 0.05), 0 1px 3px rgba(30, 35, 42, 0.08);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-cream);
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Retro Grid Background Texture */
+.retro-grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(175, 166, 148, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(175, 166, 148, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* App Container */
+.app-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* ==========================================================================
+   HEADER COMPONENT
+   ========================================================================== */
+.app-header {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-light);
+  border-bottom: 2px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.header-top-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px dashed var(--border-light);
+  margin-bottom: 1rem;
+}
+
+.sys-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--panel-inset);
+  border: 1px solid var(--border-light);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--retro-green);
+  letter-spacing: 0.5px;
+}
+
+.led-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--retro-green);
+  box-shadow: 0 0 6px var(--retro-green);
+  display: inline-block;
+  animation: pulse-led 2s infinite ease-in-out;
+}
+
+@keyframes pulse-led {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
+
+.sys-specs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.spec-tag, .version-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--panel-inset);
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.version-tag {
+  background: var(--retro-amber-light);
+  color: var(--retro-amber);
+  border-color: var(--retro-amber);
+  font-weight: 700;
+}
+
+.header-title-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.terminal-prompt-icon {
+  font-family: var(--font-digital);
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--retro-teal);
+  background: var(--panel-inset);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.65rem;
+  box-shadow: var(--shadow-retro);
+}
+
+.main-title {
+  font-family: var(--font-sans);
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.main-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Retro Navigation Bar */
+.retro-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--border-light);
+}
+
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text-muted);
+  background: var(--panel-inset);
+  border: 1px solid var(--border-light);
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease-in-out;
+}
+
+.nav-link:hover, .nav-link:focus-visible {
+  color: var(--retro-teal);
+  border-color: var(--retro-teal);
+  background: var(--retro-teal-light);
+  outline: none;
+}
+
+.nav-link.active {
+  color: var(--text-main);
+  background: var(--panel-highlight);
+  border-color: var(--border-dark);
+  box-shadow: 1px 1px 0px var(--border-dark);
+}
+
+/* ==========================================================================
+   RETRO CARDS & LAYOUT
+   ========================================================================== */
+.retro-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-light);
+  border-bottom: 2px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  margin-bottom: 1.75rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: var(--panel-inset);
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.card-chip {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--retro-teal);
+  background: var(--retro-teal-light);
+  border: 1px solid rgba(13, 148, 136, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.card-title {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.2px;
+  flex-grow: 1;
+}
+
+.card-status-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-sub);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* ==========================================================================
+   FORM CONTROLS & GRID
+   ========================================================================== */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.field-index {
+  color: var(--retro-amber);
+}
+
+.required-indicator {
+  color: var(--retro-rose);
+  margin-left: 2px;
+}
+
+.input-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.retro-input, .retro-select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background: var(--panel-highlight);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease-in-out;
+}
+
+.retro-input:focus, .retro-select:focus {
+  border-color: var(--border-focus);
+  outline: 2px solid var(--retro-teal-light);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border-focus);
+}
+
+.retro-input:invalid:focus {
+  border-color: var(--retro-rose);
+}
+
+.input-hint {
+  font-size: 0.72rem;
+  color: var(--text-sub);
+  margin-top: 0.25rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--border-light);
+}
+
+/* ==========================================================================
+   BUTTON SYSTEM (RETRO TACTILE STYLE)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid var(--border-dark);
+  box-shadow: var(--shadow-retro);
+  transition: all 0.1s ease;
+  user-select: none;
+  min-height: 42px;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-retro-pressed);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--retro-teal);
+  color: #FFFFFF;
+  border-color: #042F2E;
+}
+.btn-primary:hover {
+  background: #115E59;
+}
+
+.btn-save {
+  background: var(--retro-amber);
+  color: #FFFFFF;
+  border-color: #78350F;
+}
+.btn-save:hover {
+  background: #B45309;
+}
+
+.btn-secondary {
+  background: var(--panel-inset);
+  color: var(--text-main);
+  border-color: var(--border-dark);
+}
+.btn-secondary:hover {
+  background: #E8E2D2;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border-light);
+  box-shadow: none;
+}
+.btn-ghost:hover {
+  background: var(--panel-inset);
+  color: var(--text-main);
+}
+
+.btn-sm {
+  font-size: 0.72rem;
+  padding: 0.35rem 0.65rem;
+  min-height: 30px;
+}
+
+.btn-danger-sm {
+  background: var(--retro-rose-light);
+  color: var(--retro-rose);
+  border: 1px solid var(--retro-rose);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.btn-danger-sm:hover {
+  background: var(--retro-rose);
+  color: #FFFFFF;
+}
+
+.btn-action-sm {
+  background: var(--retro-teal-light);
+  color: var(--retro-teal);
+  border: 1px solid var(--retro-teal);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-right: 0.35rem;
+  transition: all 0.1s;
+}
+.btn-action-sm:hover {
+  background: var(--retro-teal);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   DIGITAL TELEMETRY READOUT CARDS
+   ========================================================================== */
+.active-project-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+.digital-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.digital-card {
+  background: var(--panel-inset);
+  border: 1px solid var(--border-light);
+  border-top: 3px solid var(--retro-teal);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.digital-card:hover {
+  transform: translateY(-2px);
+  border-top-color: var(--retro-amber);
+}
+
+.digital-card-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.digital-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.digital-number {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-main);
+  letter-spacing: -1px;
+}
+
+.digital-unit {
+  font-family: var(--font-digital);
+  font-size: 1.3rem;
+  color: var(--retro-amber);
+  font-weight: bold;
+}
+
+.digital-meta {
+  font-size: 0.72rem;
+  color: var(--text-sub);
+  margin-top: 0.5rem;
+  font-family: var(--font-sans);
+}
+
+/* ==========================================================================
+   EFFORT BREAKDOWN LIST & PROGRESS BARS
+   ========================================================================== */
+.breakdown-container {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+}
+
+.breakdown-title {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.breakdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.item-name {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.item-value {
+  font-weight: 700;
+  color: var(--retro-teal);
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--panel-inset);
+  border: 1px solid var(--border-light);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress-teal { background: var(--retro-teal); }
+.progress-amber { background: var(--retro-amber); }
+.progress-blue { background: var(--retro-blue); }
+.progress-purple { background: var(--retro-purple); }
+.progress-rose { background: var(--retro-rose); }
+
+.item-formula-note {
+  font-size: 0.7rem;
+  color: var(--text-sub);
+  font-family: var(--font-mono);
+}
+
+.highlight-item {
+  background: var(--panel-inset);
+  border: 1px dashed var(--border-light);
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-top: 0.5rem;
+}
+
+.throughput-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: var(--panel-highlight);
+  border: 1px solid var(--border-light);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   CHARTS & VISUAL ANALYTICS
+   ========================================================================== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-box {
+  background: var(--panel-inset);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-box.full-width-chart {
+  grid-column: 1 / -1;
+}
+
+.chart-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.2rem;
+}
+
+.chart-desc {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  margin-bottom: 1rem;
+}
+
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+.chart-canvas-wrap.bar-canvas-wrap {
+  height: 280px;
+}
+
+/* ==========================================================================
+   RETRO TABLES (HISTORY & SIMULATION)
+   ========================================================================== */
+.simulator-intro {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.history-table-wrap, .simulator-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--panel-highlight);
+}
+
+.retro-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.retro-table th {
+  background: var(--panel-inset);
+  color: var(--text-main);
+  font-weight: 700;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border-dark);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.retro-table td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.retro-table tbody tr:hover {
+  background: var(--panel-inset);
+}
+
+.retro-table tbody tr.row-baseline {
+  background: var(--retro-teal-light);
+  font-weight: 700;
+}
+
+.badge-tag {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.badge-low { background: #FEF3C7; color: #92400E; }
+.badge-med { background: #E0E7FF; color: #3730A3; }
+.badge-high { background: #FEE2E2; color: #991B1B; }
+
+.diff-up { color: var(--retro-rose); font-weight: 700; }
+.diff-down { color: var(--retro-green); font-weight: 700; }
+.diff-neutral { color: var(--text-sub); }
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem !important;
+  color: var(--text-sub) !important;
+  font-style: italic;
+}
+
+/* ==========================================================================
+   METHODOLOGY & VIVA SECTION
+   ========================================================================== */
+.retro-alert-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--retro-amber-light);
+  border: 1px solid var(--retro-amber);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.alert-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.alert-text strong {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #92400E;
+}
+
+.alert-text p {
+  font-size: 0.82rem;
+  color: #78350F;
+  margin-top: 0.35rem;
+  line-height: 1.45;
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.glossary-card {
+  background: var(--panel-inset);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 1.15rem;
+}
+
+.glossary-q {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  border-bottom: 1px dashed var(--border-light);
+  padding-bottom: 0.35rem;
+}
+
+.glossary-a {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.glossary-a code {
+  font-family: var(--font-mono);
+  background: var(--panel-highlight);
+  border: 1px solid var(--border-light);
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  color: var(--retro-teal);
+}
+
+.math-card {
+  background: #252B33;
+  color: #E6EDF3;
+  border: 1px solid #161B22;
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.math-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #58A6FF;
+  margin-bottom: 0.75rem;
+}
+
+.formula-block code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #7EE787;
+  display: block;
+}
+
+/* ==========================================================================
+   RETRO TOAST NOTIFICATIONS
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.75rem 1.15rem;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  animation: slide-in 0.25s ease forwards;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast-success {
+  background: #F0FDF4;
+  color: #166534;
+  border-color: #86EFAC;
+}
+
+.toast-error {
+  background: #FEF2F2;
+  color: #991B1B;
+  border-color: #FCA5A5;
+}
+
+.toast-info {
+  background: #F0FDF9;
+  color: #115E59;
+  border-color: #5EEAD4;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.app-footer {
+  margin-top: 2rem;
+  padding: 1.25rem 0.5rem;
+  border-top: 1px dashed var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-sub);
+}
+
+.status-indicator-mini {
+  color: var(--retro-green);
+}
+
+/* ==========================================================================
+   ACCESSIBILITY & REDUCED MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (320px - 1440px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0.75rem 0.5rem 2rem;
+  }
+
+  .main-title {
+    font-size: 1.3rem;
+  }
+
+  .digital-number {
+    font-size: 1.8rem;
+  }
+
+  .digital-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .app-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-top-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sys-specs {
+    width: 100%;
+  }
+}

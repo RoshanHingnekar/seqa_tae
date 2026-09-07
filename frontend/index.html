@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOFTWARE TESTING RESOURCE ESTIMATOR | QA Resource & Effort Calculator</title>
+  <meta name="description" content="Production-ready QA resource estimation calculator. Estimates testing effort, person-hours, FTE, and duration based on project size, coverage, complexity, and retest overhead.">
+  
+  <!-- Modern & Retro Monospace Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Retro background grid texture -->
+  <div class="retro-grid-bg" aria-hidden="true"></div>
+
+  <div class="app-container">
+    <!-- Top System Telemetry Bar -->
+    <header class="app-header">
+      <div class="header-top-meta">
+        <div class="sys-badge">
+          <span class="led-indicator active" aria-hidden="true"></span>
+          <span class="sys-badge-text">● SYSTEM READY</span>
+        </div>
+        <div class="sys-specs">
+          <span class="spec-tag">BUILD: 2026.1</span>
+          <span class="spec-tag">RUNTIME: PY-3.12 / PSQL</span>
+          <span class="version-tag">VERSION 1.0</span>
+        </div>
+      </div>
+      
+      <div class="header-title-box">
+        <div class="terminal-prompt-icon">&gt;_</div>
+        <div class="title-wrap">
+          <h1 class="main-title">SOFTWARE TESTING RESOURCE ESTIMATOR</h1>
+          <p class="main-subtitle">&ldquo;Estimate QA effort before the first test case runs.&rdquo;</p>
+        </div>
+      </div>
+
+      <!-- Quick Nav Links -->
+      <nav class="retro-nav" aria-label="Quick Navigation">
+        <a href="#calculator-section" class="nav-link active">01. CALCULATOR</a>
+        <a href="#results-section" class="nav-link">02. ESTIMATION TELEMETRY</a>
+        <a href="#analytics-section" class="nav-link">03. CHARTS &amp; ANALYTICS</a>
+        <a href="#simulator-section" class="nav-link">04. COVERAGE SIMULATOR</a>
+        <a href="#history-section" class="nav-link">05. SAVED PROJECTS</a>
+        <a href="#methodology-section" class="nav-link">06. METHODOLOGY &amp; VIVA</a>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <!-- Notification Toast Container -->
+      <div id="retro-toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+      <!-- CALCULATOR INPUT SECTION -->
+      <section id="calculator-section" class="retro-card" aria-labelledby="calc-title">
+        <div class="card-header">
+          <span class="card-chip">MODULE: INPUT_PARAMETERS</span>
+          <h2 id="calc-title" class="card-title">PROJECT METRICS SPECIFICATION</h2>
+          <span class="card-status-label">MODE: DYNAMIC_COMPUTE</span>
+        </div>
+        
+        <div class="card-body">
+          <form id="estimator-form" novalidate>
+            <div class="form-grid">
+              <!-- Project Name -->
+              <div class="form-group full-width">
+                <label for="project_name" class="field-label">
+                  <span class="field-index">[01]</span> Project Name
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="text" id="project_name" name="project_name" class="retro-input" 
+                         placeholder="e.g. E-Commerce Application" required autocomplete="off"
+                         value="E-Commerce Application">
+                  <span class="input-hint">Descriptive identifier for QA estimation report</span>
+                </div>
+              </div>
+
+              <!-- LOC -->
+              <div class="form-group">
+                <label for="loc" class="field-label">
+                  <span class="field-index">[02]</span> Lines of Code (LOC)
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="loc" name="loc" class="retro-input" 
+                         min="0" step="100" placeholder="50000" value="50000" required>
+                  <span class="input-hint">Application code size baseline</span>
+                </div>
+              </div>
+
+              <!-- Test Cases -->
+              <div class="form-group">
+                <label for="test_cases" class="field-label">
+                  <span class="field-index">[03]</span> Number of Test Cases
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="test_cases" name="test_cases" class="retro-input" 
+                         min="0" step="1" placeholder="1250" value="1250" required>
+                  <span class="input-hint">Planned test scenario count</span>
+                </div>
+              </div>
+
+              <!-- Target Coverage -->
+              <div class="form-group">
+                <label for="coverage" class="field-label">
+                  <span class="field-index">[04]</span> Target Test Coverage (%)
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="coverage" name="coverage" class="retro-input" 
+                         min="0" max="100" step="1" placeholder="80" value="80" required>
+                  <span class="input-hint">Baseline benchmark is 80%</span>
+                </div>
+              </div>
+
+              <!-- Avg Test Execution Time -->
+              <div class="form-group">
+                <label for="avg_test_minutes" class="field-label">
+                  <span class="field-index">[05]</span> Avg Test Time (Minutes)
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="avg_test_minutes" name="avg_test_minutes" class="retro-input" 
+                         min="0.1" step="0.5" placeholder="12" value="12" required>
+                  <span class="input-hint">Mean minutes to execute 1 test case</span>
+                </div>
+              </div>
+
+              <!-- QA Productivity -->
+              <div class="form-group">
+                <label for="qa_productivity" class="field-label">
+                  <span class="field-index">[06]</span> QA Productivity (Cases/Hour)
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="qa_productivity" name="qa_productivity" class="retro-input" 
+                         min="0.1" step="0.5" placeholder="6" value="6" required>
+                  <span class="input-hint">Throughput rate per tester</span>
+                </div>
+              </div>
+
+              <!-- Complexity Dropdown -->
+              <div class="form-group">
+                <label for="complexity" class="field-label">
+                  <span class="field-index">[07]</span> Project Complexity
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <select id="complexity" name="complexity" class="retro-select" required>
+                    <option value="low">Low (Factor: 0.85) - Standard CRUD / Simple UI</option>
+                    <option value="medium" selected>Medium (Factor: 1.00) - Standard Business Logic</option>
+                    <option value="high">High (Factor: 1.25) - Distributed / Highly Regulated</option>
+                  </select>
+                  <span class="input-hint">Architecture &amp; risk multiplier</span>
+                </div>
+              </div>
+
+              <!-- Retest Buffer -->
+              <div class="form-group">
+                <label for="retest_buffer" class="field-label">
+                  <span class="field-index">[08]</span> Retest / Regression Buffer (%)
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="retest_buffer" name="retest_buffer" class="retro-input" 
+                         min="0" max="100" step="1" placeholder="15" value="15" required>
+                  <span class="input-hint">Bug fixes &amp; regression re-run allowance</span>
+                </div>
+              </div>
+
+              <!-- Working Hours -->
+              <div class="form-group">
+                <label for="working_hours" class="field-label">
+                  <span class="field-index">[09]</span> Working Hours / Day
+                  <span class="required-indicator" title="Required">*</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="working_hours" name="working_hours" class="retro-input" 
+                         min="1" max="24" step="0.5" placeholder="8" value="8" required>
+                  <span class="input-hint">Productive hours per engineer per day</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="form-actions">
+              <button type="submit" id="btn-calculate" class="btn btn-primary">
+                <span class="btn-icon">⚡</span>
+                <span id="btn-calc-text">CALCULATE ESTIMATE</span>
+              </button>
+              
+              <button type="button" id="btn-save" class="btn btn-save">
+                <span class="btn-icon">💾</span>
+                <span id="btn-save-text">SAVE TO DATABASE</span>
+              </button>
+
+              <button type="button" id="btn-reset" class="btn btn-secondary">
+                <span class="btn-icon">↺</span>
+                RESET FORM
+              </button>
+              
+              <button type="button" id="btn-load-sample" class="btn btn-ghost">
+                <span class="btn-icon">📋</span>
+                LOAD SPEC SAMPLE
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ESTIMATION RESULTS & TELEMETRY SECTION -->
+      <section id="results-section" class="retro-card" aria-labelledby="results-title">
+        <div class="card-header">
+          <span class="card-chip">MODULE: OUTPUT_TELEMETRY</span>
+          <h2 id="results-title" class="card-title">ESTIMATION SUMMARY READOUT</h2>
+          <span id="active-project-badge" class="active-project-badge">ACTIVE: E-COMMERCE APPLICATION</span>
+        </div>
+
+        <div class="card-body">
+          <!-- Big Digital Readout Cards -->
+          <div class="digital-metrics-grid" aria-live="polite" id="telemetry-display">
+            <!-- Total QA Hours -->
+            <div class="digital-card" id="card-total-hours">
+              <div class="digital-card-label">TOTAL QA EFFORT</div>
+              <div class="digital-display">
+                <span id="val-total-hours" class="digital-number">287.5</span>
+                <span class="digital-unit">HRS</span>
+              </div>
+              <div class="digital-meta">Base + Retest Overhead</div>
+            </div>
+
+            <!-- Person Days -->
+            <div class="digital-card" id="card-person-days">
+              <div class="digital-card-label">PERSON DAYS</div>
+              <div class="digital-display">
+                <span id="val-person-days" class="digital-number">35.9</span>
+                <span class="digital-unit">DAYS</span>
+              </div>
+              <div class="digital-meta">Effort / Working Hours (8h/day)</div>
+            </div>
+
+            <!-- QA FTE -->
+            <div class="digital-card" id="card-fte">
+              <div class="digital-card-label">QA FTE REQUIRED</div>
+              <div class="digital-display">
+                <span id="val-fte" class="digital-number">1.80</span>
+                <span class="digital-unit">FTE</span>
+              </div>
+              <div class="digital-meta">160 Productive Hrs / Month</div>
+            </div>
+
+            <!-- Estimated Duration -->
+            <div class="digital-card" id="card-duration">
+              <div class="digital-card-label">ESTIMATED DURATION</div>
+              <div class="digital-display">
+                <span id="val-duration" class="digital-number">36</span>
+                <span class="digital-unit">DAYS</span>
+              </div>
+              <div class="digital-meta">Single Tester Stream (Ceil)</div>
+            </div>
+          </div>
+
+          <!-- EFFORT BREAKDOWN PROGRESS BARS -->
+          <div class="breakdown-container">
+            <h3 class="breakdown-title">
+              <span class="sub-icon">📊</span> EFFORT ALLOCATION BREAKDOWN
+            </h3>
+            
+            <div class="breakdown-list">
+              <!-- Test Execution -->
+              <div class="breakdown-item">
+                <div class="item-header">
+                  <span class="item-name">1. Direct Test Execution</span>
+                  <span id="txt-exec-hours" class="item-value">250.0 hrs</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-exec" class="progress-bar progress-teal" style="width: 86.9%;"></div>
+                </div>
+                <div class="item-formula-note">(1,250 cases × 12 mins) / 60 = 250.0 hrs</div>
+              </div>
+
+              <!-- LOC-Based Testing -->
+              <div class="breakdown-item">
+                <div class="item-header">
+                  <span class="item-name">2. LOC-Based Testing Assumption</span>
+                  <span id="txt-loc-hours" class="item-value">0.0 hrs</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-loc" class="progress-bar progress-amber" style="width: 0%;"></div>
+                </div>
+                <div class="item-formula-note">50,000 LOC × 0.00 factor = 0.0 hrs</div>
+              </div>
+
+              <!-- Coverage Adjustment -->
+              <div class="breakdown-item">
+                <div class="item-header">
+                  <span class="item-name">3. Coverage Multiplier Factor</span>
+                  <span id="txt-cov-factor" class="item-value">1.0000× (80% / 80% baseline)</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-cov" class="progress-bar progress-blue" style="width: 80%;"></div>
+                </div>
+                <div class="item-formula-note">Target 80% / Baseline 80% = 1.0000</div>
+              </div>
+
+              <!-- Complexity Adjustment -->
+              <div class="breakdown-item">
+                <div class="item-header">
+                  <span class="item-name">4. Complexity Factor Multiplier</span>
+                  <span id="txt-comp-factor" class="item-value">1.00× (Medium Complexity)</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-comp" class="progress-bar progress-purple" style="width: 80%;"></div>
+                </div>
+                <div class="item-formula-note">Base QA Effort: (250 + 0) × 1.0 × 1.0 = 250.0 hrs</div>
+              </div>
+
+              <!-- Regression / Retest -->
+              <div class="breakdown-item">
+                <div class="item-header">
+                  <span class="item-name">5. Regression &amp; Defect Retest Overhead</span>
+                  <span id="txt-retest-hours" class="item-value">37.5 hrs</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-retest" class="progress-bar progress-rose" style="width: 13.1%;"></div>
+                </div>
+                <div class="item-formula-note">Base Effort 250.0 hrs × 15% Retest Buffer = 37.5 hrs</div>
+              </div>
+
+              <!-- Productivity Throughput Telemetry -->
+              <div class="breakdown-item highlight-item">
+                <div class="item-header">
+                  <span class="item-name">⚡ QA Productivity &amp; Velocity Benchmark</span>
+                  <span id="txt-prod-analysis" class="item-value">Target: 6.0 cases/hr | Nominal: 5.0 cases/hr</span>
+                </div>
+                <div class="throughput-badges">
+                  <span class="badge" id="badge-daily-cap">Daily Capacity: 48 cases / tester-day</span>
+                  <span class="badge" id="badge-exec-rate">Execution Rate: 12 min/test</span>
+                  <span class="badge" id="badge-team-pace">Required Pace: 34.8 cases/day</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS SECTION WITH CHART.JS -->
+      <section id="analytics-section" class="retro-card" aria-labelledby="analytics-title">
+        <div class="card-header">
+          <span class="card-chip">MODULE: VISUAL_ANALYTICS</span>
+          <h2 id="analytics-title" class="card-title">RESOURCE EFFORT VISUALIZATION</h2>
+          <span class="card-status-label">CHART.JS ENGINE READY</span>
+        </div>
+
+        <div class="card-body">
+          <div class="charts-grid">
+            <!-- Chart 1: Effort Distribution (Doughnut) -->
+            <div class="chart-box">
+              <h3 class="chart-title">CHART 1: EFFORT DISTRIBUTION</h3>
+              <p class="chart-desc">Proportional share of execution, LOC, and retest effort</p>
+              <div class="chart-canvas-wrap">
+                <canvas id="chartDistribution" aria-label="Doughnut chart of Effort Distribution" role="img"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: Coverage vs QA Hours (Line) -->
+            <div class="chart-box">
+              <h3 class="chart-title">CHART 2: COVERAGE SENSITIVITY CURVE</h3>
+              <p class="chart-desc">Simulated QA hours across 60%, 70%, 80%, 90%, 100%</p>
+              <div class="chart-canvas-wrap">
+                <canvas id="chartCoverage" aria-label="Line chart of Coverage vs QA Hours" role="img"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 3: Effort Breakdown (Bar) -->
+            <div class="chart-box full-width-chart">
+              <h3 class="chart-title">CHART 3: EFFORT CATEGORIES BREAKDOWN</h3>
+              <p class="chart-desc">Comparative breakdown in engineering hours</p>
+              <div class="chart-canvas-wrap bar-canvas-wrap">
+                <canvas id="chartCategories" aria-label="Bar chart of Effort Breakdown" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COVERAGE IMPACT SIMULATOR -->
+      <section id="simulator-section" class="retro-card" aria-labelledby="simulator-title">
+        <div class="card-header">
+          <span class="card-chip">MODULE: SCENARIO_SIMULATOR</span>
+          <h2 id="simulator-title" class="card-title">COVERAGE IMPACT SIMULATOR</h2>
+          <span class="card-status-label">BENCHMARK: 80% TARGET</span>
+        </div>
+
+        <div class="card-body">
+          <p class="simulator-intro">
+            Simulate how raising or lowering QA coverage targets directly impacts total required person-hours, team person-days, and full-time equivalent staffing relative to the 80% baseline standard.
+          </p>
+
+          <div class="simulator-table-wrap">
+            <table class="retro-table" id="simulation-table">
+              <thead>
+                <tr>
+                  <th scope="col">COVERAGE TARGET</th>
+                  <th scope="col">ESTIMATED EFFORT</th>
+                  <th scope="col">PERSON DAYS</th>
+                  <th scope="col">FTE</th>
+                  <th scope="col">DIFFERENCE VS 80% BASELINE</th>
+                  <th scope="col">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="simulation-tbody">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SAVED PROJECTS HISTORY SECTION -->
+      <section id="history-section" class="retro-card" aria-labelledby="history-title">
+        <div class="card-header">
+          <span class="card-chip">MODULE: PERSISTENT_RECORDS</span>
+          <h2 id="history-title" class="card-title">PROJECT ESTIMATION HISTORY</h2>
+          <button type="button" id="btn-refresh-history" class="btn-sm btn-secondary" title="Refresh records from database">
+            🔄 REFRESH RECORDS
+          </button>
+        </div>
+
+        <div class="card-body">
+          <div class="history-table-wrap">
+            <table class="retro-table" id="history-table">
+              <thead>
+                <tr>
+                  <th scope="col">PROJECT</th>
+                  <th scope="col">LOC</th>
+                  <th scope="col">TEST CASES</th>
+                  <th scope="col">COV %</th>
+                  <th scope="col">COMPLEXITY</th>
+                  <th scope="col">TOTAL HOURS</th>
+                  <th scope="col">FTE</th>
+                  <th scope="col">RECORDED AT</th>
+                  <th scope="col">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr>
+                  <td colspan="9" class="empty-state">CONNECTING TO DATABASE TO LOAD SAVED ESTIMATIONS...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- METHODOLOGY & VIVA KNOWLEDGE BASE SECTION -->
+      <section id="methodology-section" class="retro-card" aria-labelledby="method-title">
+        <div class="card-header">
+          <span class="card-chip">MODULE: KNOWLEDGE_BASE</span>
+          <h2 id="method-title" class="card-title">ESTIMATION METHODOLOGY &amp; VIVA GUIDE</h2>
+          <span class="card-status-label">ACADEMIC &amp; INDUSTRY SPECIFICATION</span>
+        </div>
+
+        <div class="card-body methodology-content">
+          <!-- Important Assumption Alert Banner -->
+          <div class="retro-alert-box" role="note">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-text">
+              <strong>IMPORTANT ASSUMPTION:</strong>
+              <p>
+                &ldquo;This estimator provides an approximation based on configurable assumptions. Actual QA effort depends on requirements quality, application complexity, automation level, test environment stability, team experience, tooling, defect density, regression scope, and other project-specific factors.&rdquo;
+              </p>
+            </div>
+          </div>
+
+          <div class="glossary-grid">
+            <!-- Question 1: LOC -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">01. What is Lines of Code (LOC)?</h3>
+              <p class="glossary-a">
+                <strong>Lines of Code (LOC)</strong> measures the physical size of the software codebase. In testing estimation, LOC represents the scope of logic and surface area that could harbor defects. While not a direct proxy for test count, larger codebases incur structural exploration and comprehension overhead.
+              </p>
+            </article>
+
+            <!-- Question 2: Test Cases -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">02. What are Test Cases?</h3>
+              <p class="glossary-a">
+                A <strong>Test Case</strong> is a documented set of preconditions, inputs, execution procedures, and expected outcomes designed to verify a specific software requirement or code branch.
+              </p>
+            </article>
+
+            <!-- Question 3: Coverage -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">03. What is Test Coverage?</h3>
+              <p class="glossary-a">
+                <strong>Test Coverage (%)</strong> represents the proportion of requirements, code paths, or features exercised by the test suite. Higher coverage diminishes untested code risks but demands non-linearly increasing effort.
+              </p>
+            </article>
+
+            <!-- Question 4: Why Higher Coverage Requires More Effort -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">04. Why does higher coverage require more effort?</h3>
+              <p class="glossary-a">
+                Achieving baseline coverage (60-80%) covers the primary "happy paths". Reaching 90-100% requires designing complex scenarios, boundary value tests, concurrency races, error-handling injection, and mock fixtures, leading to exponentially diminishing returns per hour invested.
+              </p>
+            </article>
+
+            <!-- Question 5: QA Productivity -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">05. What is QA Productivity?</h3>
+              <p class="glossary-a">
+                <strong>QA Productivity</strong> is the rate of test execution throughput, measured here in <em>test cases completed per hour</em> (e.g., 5 to 8 cases/hr for manual regression). It defines the team's operational velocity.
+              </p>
+            </article>
+
+            <!-- Question 6: Complexity -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">06. What is Project Complexity?</h3>
+              <p class="glossary-a">
+                Architectural complexity accounts for integrations, distributed microservices, multi-tier security, statefulness, and data volume.
+                <br>
+                • <strong>Low (0.85):</strong> Simple CRUD, minimal integrations.<br>
+                • <strong>Medium (1.00):</strong> Standard enterprise web application.<br>
+                • <strong>High (1.25):</strong> High concurrency, financial transactions, multi-tenant compliance.
+              </p>
+            </article>
+
+            <!-- Question 7: Regression / Retest -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">07. What is Regression / Retest Effort?</h3>
+              <p class="glossary-a">
+                When bugs are resolved by developers, QA must <strong>retest</strong> the defect and perform <strong>regression testing</strong> to ensure fixes did not corrupt untouched features. A standard 15% to 25% buffer protects against cycle slippage.
+              </p>
+            </article>
+
+            <!-- Question 8: Person-Hour & Person-Day -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">08. What is a Person-Hour and Person-Day?</h3>
+              <p class="glossary-a">
+                A <strong>Person-Hour</strong> is the productive labor accomplished by one engineer in 60 minutes. A <strong>Person-Day</strong> is standard working hours (typically 8.0 hours) of continuous engineering effort:
+                <code>person_days = total_hours / working_hours_per_day</code>.
+              </p>
+            </article>
+
+            <!-- Question 9: FTE -->
+            <article class="glossary-card">
+              <h3 class="glossary-q">09. What is Full-Time Equivalent (FTE)?</h3>
+              <p class="glossary-a">
+                <strong>FTE</strong> converts total effort hours into the equivalent number of full-time dedicated employees over a standard business month (assuming 20 workdays × 8 hours = 160 productive hours):
+                <code>fte = total_hours / 160.0</code>.
+              </p>
+            </article>
+          </div>
+
+          <!-- Exact Mathematical Formulation -->
+          <div class="math-card">
+            <h3 class="math-title">📐 FORMULAIC SPECIFICATION MATRIX</h3>
+            <div class="formula-block">
+              <code>
+1. Test Execution Hours = (Test Cases × Avg Test Minutes) / 60<br>
+2. Coverage Factor = Target Coverage (%) / 80.0<br>
+3. LOC Testing Hours = LOC × LOC_TESTING_FACTOR (configurable, default 0.0)<br>
+4. Base QA Effort = (Test Execution Hours + LOC Testing Hours) × Coverage Factor × Complexity Factor<br>
+5. Retest Overhead = Base QA Effort × (Retest Buffer % / 100)<br>
+6. Total QA Effort = Base QA Effort + Retest Overhead<br>
+7. Person Days = Total QA Effort / Working Hours Per Day<br>
+8. QA FTE = Total QA Effort / 160.0<br>
+9. Duration Days = ⌈Total QA Effort / Working Hours Per Day⌉
+              </code>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Retro Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>SOFTWARE TESTING RESOURCE ESTIMATOR</span> • <span>RENDER READY</span>
+      </div>
+      <div class="footer-center">
+        <span>LIGHT RETRO COMPUTER DESIGN SYSTEM</span>
+      </div>
+      <div class="footer-right">
+        <span class="status-indicator-mini">●</span> <span>ALL SYSTEMS OPERATIONAL</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
