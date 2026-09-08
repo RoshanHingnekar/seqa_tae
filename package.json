@@ -6,14 +6,14 @@
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "install:all": "npm install --include=dev && cd server && npm install --include=dev && cd ../client && npm install --include=dev",
     "db:push": "cd server && npx prisma db push",
     "db:seed": "cd server && npm run db:seed",
     "db:clear": "cd server && npm run db:clear",
     "build": "cd client && npm run build && cd ../server && npx prisma generate",
-    "start": "cd server && npx tsx src/index.ts"
+    "start": "cd server && npm run start"
   },
-  "devDependencies": {
+  "dependencies": {
     "concurrently": "^9.1.0"
   }
 }
