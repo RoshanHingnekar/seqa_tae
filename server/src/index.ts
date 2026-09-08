@@ -69,4 +69,20 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 QAEstimator Pro API Server is running on port ${PORT}`);
+
+  // Keep-Alive auto-ping for Render Free Tier (pings every 12 mins before 15m sleep timer)
+  const externalUrl = process.env.RENDER_EXTERNAL_URL || process.env.APP_URL;
+  if (externalUrl) {
+    const PING_INTERVAL_MS = 12 * 60 * 1000;
+    setInterval(async () => {
+      try {
+        const healthUrl = `${externalUrl.replace(/\/$/, '')}/api/health`;
+        const res = await fetch(healthUrl);
+        console.log(`[Keep-Alive] Pinged ${healthUrl} - Status: ${res.status}`);
+      } catch (err: any) {
+        console.warn(`[Keep-Alive] Self-ping failed:`, err?.message);
+      }
+    }, PING_INTERVAL_MS);
+    console.log(`📡 Keep-Alive auto-ping enabled for: ${externalUrl}`);
+  }
 });
