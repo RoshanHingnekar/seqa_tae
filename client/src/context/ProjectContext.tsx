@@ -26,14 +26,14 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setProjects(data);
       if (data.length > 0) {
         if (!selectedProject || !data.find((p) => p.id === selectedProject.id)) {
-          // Select E-Commerce platform if present, otherwise first
-          const defaultP = data.find((p) => p.name.includes('E-Commerce')) || data[0];
-          setSelectedProject(defaultP);
+          setSelectedProject(data[0]);
         } else {
           // update current selected project reference
           const updated = data.find((p) => p.id === selectedProject.id);
           if (updated) setSelectedProject(updated);
         }
+      } else {
+        setSelectedProject(null);
       }
     } catch (err) {
       console.error('Failed to load projects', err);

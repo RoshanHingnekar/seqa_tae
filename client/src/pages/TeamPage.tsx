@@ -241,7 +241,16 @@ export const TeamPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {filteredMembers.map((m) => (
+              {filteredMembers.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                    <Users className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                    <p className="font-semibold text-slate-700 text-sm">No QA Specialists Added</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Click "+ Add Specialist" to build your QA engineering roster.</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredMembers.map((m) => (
                 <tr key={m.id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
@@ -303,7 +312,7 @@ export const TeamPage: React.FC = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

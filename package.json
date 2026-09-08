@@ -9,6 +9,7 @@
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",
     "db:push": "cd server && npx prisma db push",
     "db:seed": "cd server && npm run db:seed",
+    "db:clear": "cd server && npm run db:clear",
     "build": "cd client && npm run build && cd ../server && npx prisma generate",
     "start": "cd server && npx tsx src/index.ts"
   },

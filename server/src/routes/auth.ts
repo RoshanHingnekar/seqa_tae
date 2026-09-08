@@ -77,12 +77,15 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       where: { email: email.toLowerCase() },
     });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({
+        error: 'No account found with this email address. Please create an account first.',
+        notRegistered: true,
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'Incorrect password. Please verify your credentials and try again.' });
     }
 
     const token = generateToken({ id: user.id, email: user.email, role: user.role });

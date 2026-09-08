@@ -39,15 +39,15 @@ export const EstimatorPage: React.FC<EstimatorPageProps> = ({ onNavigate }) => {
   const { selectedProject, refreshProjects } = useProjects();
 
   // Inputs
-  const [projectName, setProjectName] = useState('E-Commerce Full Stack Platform');
-  const [projectType, setProjectType] = useState('Full Stack Application');
-  const [loc, setLoc] = useState<number>(12500);
-  const [testCases, setTestCases] = useState<number>(420);
-  const [coverage, setCoverage] = useState<number>(85);
-  const [automationPercent, setAutomationPercent] = useState<number>(35);
+  const [projectName, setProjectName] = useState('');
+  const [projectType, setProjectType] = useState('Web Application');
+  const [loc, setLoc] = useState<number>(10000);
+  const [testCases, setTestCases] = useState<number>(300);
+  const [coverage, setCoverage] = useState<number>(80);
+  const [automationPercent, setAutomationPercent] = useState<number>(30);
   const [complexity, setComplexity] = useState<'Low' | 'Medium' | 'High'>('Medium');
   const [environments, setEnvironments] = useState<number>(1);
-  const [apiCount, setApiCount] = useState<number>(14);
+  const [apiCount, setApiCount] = useState<number>(5);
 
   // Result state
   const [result, setResult] = useState<EstimationResult | null>(null);

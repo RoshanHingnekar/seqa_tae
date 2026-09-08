@@ -59,10 +59,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [showFormulaModal, setShowFormulaModal] = useState<boolean>(false);
 
   // Quick Calculator State
-  const [quickLoc, setQuickLoc] = useState<number>(12500);
-  const [quickTestCases, setQuickTestCases] = useState<number>(420);
-  const [quickCoverage, setQuickCoverage] = useState<number>(85);
-  const [quickResult, setQuickResult] = useState<{ hours: number; days: number }>({ hours: 152, days: 19 });
+  const [quickLoc, setQuickLoc] = useState<number>(10000);
+  const [quickTestCases, setQuickTestCases] = useState<number>(300);
+  const [quickCoverage, setQuickCoverage] = useState<number>(80);
+  const [quickResult, setQuickResult] = useState<{ hours: number; days: number }>({ hours: 0, days: 0 });
   const [quickCalculating, setQuickCalculating] = useState(false);
   const [saveSuccessNotice, setSaveSuccessNotice] = useState<string | null>(null);
 
@@ -71,16 +71,24 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     const loadDashboardData = async () => {
       setLoading(true);
       try {
+        if (!selectedProject) {
+          setMetrics(null);
+          setQuickResult({ hours: 0, days: 0 });
+          const historyData = await estimationsApi.history();
+          setHistoryItems(historyData.slice(0, 5));
+          return;
+        }
+
         const payload = {
-          projectName: selectedProject?.name || 'E-Commerce Full Stack Platform',
-          projectType: selectedProject?.type || 'Full Stack Application',
-          loc: selectedProject?.loc ?? 12500,
-          testCases: selectedProject?.testCases ?? 420,
-          coverage: selectedProject?.coverage ?? 85.0,
-          automationPercent: selectedProject?.automationPercent ?? 35.0,
-          complexity: selectedProject?.complexity ?? 'Medium',
-          environments: selectedProject?.environments ?? 1,
-          apiCount: selectedProject?.apiCount ?? 14,
+          projectName: selectedProject.name,
+          projectType: selectedProject.type,
+          loc: selectedProject.loc,
+          testCases: selectedProject.testCases,
+          coverage: selectedProject.coverage,
+          automationPercent: selectedProject.automationPercent,
+          complexity: selectedProject.complexity,
+          environments: selectedProject.environments,
+          apiCount: selectedProject.apiCount,
         };
 
         const calc = await estimationsApi.calculate(payload);
@@ -151,21 +159,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         { name: 'Test Planning & Setup', value: metrics.breakdown.testPlanningPercent, hours: metrics.breakdown.testPlanningHours, color: '#3B82F6' },
         { name: 'Reporting', value: metrics.breakdown.reportingPercent, hours: metrics.breakdown.reportingHours, color: '#93C5FD' },
       ]
-    : [
-        { name: 'Manual Testing', value: 42, hours: 63.8, color: '#2563EB' },
-        { name: 'Automation Testing', value: 28, hours: 42.6, color: '#4F46E5' },
-        { name: 'Defect Retesting', value: 15, hours: 22.8, color: '#06B6D4' },
-        { name: 'Test Planning & Setup', value: 10, hours: 15.2, color: '#3B82F6' },
-        { name: 'Reporting', value: 5, hours: 7.6, color: '#93C5FD' },
-      ];
+    : [];
 
   // Trend curve data (QA Person Hours vs LOC)
   const trendData = metrics?.trendCurve || [
-    { locLabel: '1K LOC', hours: 48, previousEstimateHours: 42 },
-    { locLabel: '5K LOC', hours: 92, previousEstimateHours: 85 },
-    { locLabel: '10K LOC', hours: 138, previousEstimateHours: 125 },
-    { locLabel: '20K LOC', hours: 187, previousEstimateHours: 172 },
-    { locLabel: '30K LOC', hours: 242, previousEstimateHours: 220 },
+    { locLabel: '1K LOC', hours: 0, previousEstimateHours: 0 },
+    { locLabel: '5K LOC', hours: 0, previousEstimateHours: 0 },
+    { locLabel: '10K LOC', hours: 0, previousEstimateHours: 0 },
+    { locLabel: '20K LOC', hours: 0, previousEstimateHours: 0 },
+    { locLabel: '30K LOC', hours: 0, previousEstimateHours: 0 },
   ];
 
   return (
@@ -177,10 +179,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <div className="relative z-10 space-y-1">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-200 text-xs font-semibold border border-blue-400/20 mb-1">
             <Sparkles className="w-3.5 h-3.5 text-blue-300" />
-            <span>Active Project: {selectedProject?.name || 'E-Commerce Full Stack Platform'}</span>
+            <span>Active Project: {selectedProject?.name || 'No Project Selected'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Welcome back, {user?.name || 'Ramesh Kumar'}!
+            Welcome back{user?.name ? `, ${user.name}` : ''}!
           </h1>
           <p className="text-xs sm:text-sm text-blue-100/80 max-w-2xl">
             Estimate QA effort for your software projects quickly and accurately.
@@ -223,16 +225,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {metrics ? metrics.totalHours.toLocaleString() : '152'}
+              {metrics ? metrics.totalHours.toLocaleString() : '0'}
             </span>
             <span className="text-xs font-semibold text-slate-500">person-hours</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-            <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+12% vs last release</span>
+            <span className="flex items-center gap-1 text-slate-500 font-semibold">
+              <span>{selectedProject ? 'Estimated QA Effort' : 'No active project'}</span>
             </span>
-            <span className="text-slate-400 font-medium">~{metrics?.personDays || 19} working days</span>
+            <span className="text-slate-400 font-medium">~{metrics?.personDays || 0} working days</span>
           </div>
         </div>
 
@@ -246,14 +247,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {metrics ? metrics.loc.toLocaleString() : '12,500'}
+              {metrics ? metrics.loc.toLocaleString() : '0'}
             </span>
             <span className="text-xs font-semibold text-slate-500">LOC</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-            <span className="flex items-center gap-1 text-blue-600 font-semibold">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+4.5% sprint delta</span>
+            <span className="flex items-center gap-1 text-slate-500 font-semibold">
+              <span>Codebase Volume</span>
             </span>
             <span className="text-slate-400 font-medium">{metrics?.locRate || 6.4} hrs/1k</span>
           </div>
@@ -269,14 +269,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {metrics ? metrics.testCases.toLocaleString() : '420'}
+              {metrics ? metrics.testCases.toLocaleString() : '0'}
             </span>
             <span className="text-xs font-semibold text-slate-500">scenarios</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-            <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>{metrics?.automationPercent || 35}% automated</span>
+            <span className="flex items-center gap-1 text-slate-500 font-semibold">
+              <span>{metrics?.automationPercent || 0}% automated</span>
             </span>
             <span className="text-slate-400 font-medium">~0.12h/test</span>
           </div>
@@ -292,16 +291,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {metrics ? metrics.coverage : '85'}%
+              {metrics ? metrics.coverage : '0'}%
             </span>
             <span className="text-xs font-semibold text-slate-500">branch target</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-            <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+5% over baseline</span>
+            <span className="flex items-center gap-1 text-slate-500 font-semibold">
+              <span>Target Coverage</span>
             </span>
-            <span className="text-slate-400 font-medium">{metrics?.coverageMultiplier || 1.15}x weight</span>
+            <span className="text-slate-400 font-medium">{metrics?.coverageMultiplier || 1.0}x weight</span>
           </div>
         </div>
       </div>
@@ -386,25 +384,29 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-xl font-extrabold text-slate-900">{metrics?.totalHours || 152}</span>
+                <span className="text-xl font-extrabold text-slate-900">{metrics?.totalHours || 0}</span>
                 <span className="text-[10px] uppercase font-bold text-slate-400">Hours</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-1.5 mt-2 pt-3 border-t border-slate-100 text-xs">
-            {pieData.map((item) => (
-              <div key={item.name} className="flex items-center justify-between text-slate-600">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <span className="truncate max-w-[140px] text-[11px]">{item.name}</span>
+            {pieData.length === 0 ? (
+              <p className="text-center text-slate-400 py-3 text-xs">No active effort breakdown to display</p>
+            ) : (
+              pieData.map((item) => (
+                <div key={item.name} className="flex items-center justify-between text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="truncate max-w-[140px] text-[11px]">{item.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2 font-mono text-[11px]">
+                    <span className="font-semibold text-slate-800">{item.value}%</span>
+                    <span className="text-slate-400">({item.hours}h)</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 font-mono text-[11px]">
-                  <span className="font-semibold text-slate-800">{item.value}%</span>
-                  <span className="text-slate-400">({item.hours}h)</span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -530,36 +532,23 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                       <td className="py-2.5 pl-4 text-right font-mono font-semibold text-slate-800">{row.estimatedEffort}</td>
                     </tr>
                   )) || (
-                    <>
-                      <tr>
-                        <td className="py-2.5 pr-4 font-semibold">Lines of Code</td>
-                        <td className="py-2.5 px-4">12,500 LOC</td>
-                        <td className="py-2.5 px-4">6.4 hrs / 1,000 LOC</td>
-                        <td className="py-2.5 pl-4 text-right">80.0 hours</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2.5 pr-4 font-semibold">Test Case Count</td>
-                        <td className="py-2.5 px-4">420 Cases</td>
-                        <td className="py-2.5 px-4">0.1242 hrs / Case</td>
-                        <td className="py-2.5 pl-4 text-right">52.2 hours</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2.5 pr-4 font-semibold">Target Coverage</td>
-                        <td className="py-2.5 px-4">85%</td>
-                        <td className="py-2.5 px-4">1.15x Multiplier</td>
-                        <td className="py-2.5 pl-4 text-right">+19.8 hours factor</td>
-                      </tr>
-                    </>
+                    <tr>
+                      <td colSpan={4} className="py-8 text-center text-slate-400">
+                        No active project parameters. Select a project or run a quick estimate.
+                      </td>
+                    </tr>
                   )}
                   {/* Total Row */}
-                  <tr className="border-t-2 border-slate-200 bg-blue-50/40 text-blue-950 font-bold">
-                    <td className="py-3 pr-4">Total Estimated QA Effort</td>
-                    <td className="py-3 px-4 font-mono">{metrics?.loc?.toLocaleString() || '12,500'} LOC + {metrics?.testCases || 420} TC</td>
-                    <td className="py-3 px-4">Combined Multipliers</td>
-                    <td className="py-3 pl-4 text-right font-mono text-sm text-blue-700">
-                      {metrics?.totalHours || 152} person-hours
-                    </td>
-                  </tr>
+                  {metrics && (
+                    <tr className="border-t-2 border-slate-200 bg-blue-50/40 text-blue-950 font-bold">
+                      <td className="py-3 pr-4">Total Estimated QA Effort</td>
+                      <td className="py-3 px-4 font-mono">{metrics.loc.toLocaleString()} LOC + {metrics.testCases} TC</td>
+                      <td className="py-3 px-4">Combined Multipliers</td>
+                      <td className="py-3 pl-4 text-right font-mono text-sm text-blue-700">
+                        {metrics.totalHours} person-hours
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -569,7 +558,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <span>Formula standard: <strong>(LOC + TC Effort) × Coverage × Complexity × Env</strong></span>
             <button
               onClick={handleSaveCurrentEstimate}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold flex items-center gap-1.5 transition-colors"
+              disabled={!metrics}
+              className="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-800 font-semibold flex items-center gap-1.5 transition-colors"
             >
               <Save className="w-3.5 h-3.5 text-blue-600" />
               <span>Save as Estimation Snapshot</span>
@@ -594,12 +584,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     : 'bg-blue-100 text-blue-800'
                 }`}
               >
-                {metrics?.complexity || 'Medium'}
+                {metrics?.complexity || 'N/A'}
               </span>
             </div>
 
             <p className="text-xs text-slate-600 mb-4">
-              Automatically determined from architectural scale and test environment matrix:
+              {metrics
+                ? 'Automatically determined from architectural scale and test environment matrix:'
+                : 'No project complexity data available. Create or select a project to evaluate complexity.'}
             </p>
 
             <div className="space-y-2">
@@ -614,17 +606,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </span>
                 </div>
               )) || (
-                <>
-                  <div className="p-2.5 rounded-xl bg-slate-50 text-xs flex justify-between">
-                    <span>Web + Mobile</span> <span className="font-bold">Enabled</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 text-xs flex justify-between">
-                    <span>External Integrations</span> <span className="font-bold">14 APIs</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 text-xs flex justify-between">
-                    <span>Multiple Environments</span> <span className="font-bold">Staging / Prod</span>
-                  </div>
-                </>
+                <div className="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
+                  Select a project to analyze complexity factors.
+                </div>
               )}
             </div>
           </div>
@@ -637,19 +621,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-2 rounded-xl bg-blue-50 border border-blue-100">
                 <span className="block text-lg font-extrabold text-blue-700">
-                  {metrics?.recommendedTeam?.qaLead || 1}
+                  {metrics?.recommendedTeam?.qaLead ?? 0}
                 </span>
                 <span className="text-[10px] font-semibold text-blue-900">QA Lead</span>
               </div>
               <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100">
                 <span className="block text-lg font-extrabold text-indigo-700">
-                  {metrics?.recommendedTeam?.qaEngineers || 2}
+                  {metrics?.recommendedTeam?.qaEngineers ?? 0}
                 </span>
                 <span className="text-[10px] font-semibold text-indigo-900">QA Engineers</span>
               </div>
               <div className="p-2 rounded-xl bg-cyan-50 border border-cyan-100">
                 <span className="block text-lg font-extrabold text-cyan-700">
-                  {metrics?.recommendedTeam?.automationEngineers || 1}
+                  {metrics?.recommendedTeam?.automationEngineers ?? 0}
                 </span>
                 <span className="text-[10px] font-semibold text-cyan-900">SDET / Auto</span>
               </div>

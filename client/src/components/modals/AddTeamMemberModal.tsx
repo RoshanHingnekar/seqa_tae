@@ -40,7 +40,7 @@ export const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({ isOpen, 
         capacity: Number(capacity),
         email: email.trim().toLowerCase(),
         phone: phone.trim() || undefined,
-        assignedProjects: assignedProjects.trim() || 'E-Commerce Platform',
+        assignedProjects: assignedProjects.trim() || undefined,
       });
       onClose();
       if (onAdded) onAdded();

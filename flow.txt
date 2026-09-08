@@ -1,0 +1,418 @@
+================================================================================
+          QAESTIMATOR PRO – APPLICATION FLOW & END-TO-END TESTING GUIDE
+================================================================================
+
+TABLE OF CONTENTS:
+--------------------------------------------------------------------------------
+1. WHAT IS THIS PROJECT? (OVERVIEW & PURPOSE)
+2. TECHNICAL ARCHITECTURE & HOW IT WORKS UNDER THE HOOD
+3. CORE ESTIMATION ENGINE & MATHEMATICAL FORMULA
+4. COMPLETE APPLICATION WORKFLOW (PAGE-BY-PAGE)
+5. STEP-BY-STEP DETAILED TESTING GUIDE (WHAT TO DO FROM LOGIN TO REPORTS)
+6. USEFUL COMMANDS & TROUBLESHOOTING
+--------------------------------------------------------------------------------
+
+
+================================================================================
+1. WHAT IS THIS PROJECT? (OVERVIEW & PURPOSE)
+================================================================================
+QAEstimator Pro is an enterprise software testing resource and person-hour
+estimation platform designed for Quality Assurance (QA) Managers, SDET Leads,
+and Engineering Directors.
+
+Key Problems It Solves:
+-----------------------
+- Software development teams often guess QA timelines, leading to testing
+  delays, missed bugs, or team burnout.
+- QAEstimator Pro replaces guesswork with a calibrated mathematical engine that
+  takes concrete project variables (Lines of Code, Number of Test Cases,
+  Coverage Target, System Complexity, and Testing Environments) and computes:
+    * Total QA Person-Hours
+    * Person-Days (based on an 8-hour workday)
+    * Person-Weeks (based on a 5-day workweek)
+    * Recommended QA Team Composition (QA Lead, Manual Engineers, SDETs)
+    * Workload Distribution (Manual Testing, Automation, Retesting, Planning, Reporting)
+- Includes full Test Management, Team Roster & Capacity tracking, Audit History,
+  and Instant Export to formal PDF and Excel reports.
+
+
+================================================================================
+2. TECHNICAL ARCHITECTURE & HOW IT WORKS UNDER THE HOOD
+================================================================================
+The project follows a modern decoupled client-server architecture:
+
+A. FRONTEND CLIENT (/client):
+   - Framework: React 18 + TypeScript + Vite 6
+   - Styling: Tailwind CSS (Clean Enterprise Blue #2563EB theme)
+   - Icons: Lucide React
+   - Visual Analytics: Recharts (Interactive Line charts, Donut charts, Area charts)
+   - Document Export: jsPDF + jspdf-autotable (PDF) + SheetJS / xlsx (Excel spreadsheets)
+   - Port: http://localhost:5173
+   - Reverse Proxy: Vite proxies all `/api/*` traffic seamlessly to http://localhost:5000
+
+B. BACKEND API SERVER (/server):
+   - Runtime: Node.js (tested with v24 and modern LTS versions) + TypeScript + tsx
+   - Framework: Express 4
+   - ORM / Database Layer: Prisma ORM v5
+   - Primary Database: SQLite (file: server/prisma/dev.db) - zero setup required
+   - Security: JWT (JSON Web Tokens) with Bearer token authentication + Bcrypt password hashing
+   - Input Validation: Zod schemas for type-safe payload validation
+   - Port: http://localhost:5000
+
+C. DATABASE SCHEMA ENTITIES:
+   - User: Accounts, credentials, roles, profile, organization
+   - Project: Software projects with code volume (LOC), test cases, coverage, status
+   - Estimation: Detailed calculation records with multipliers and breakdowns
+   - TestCase: Test cases (ID, Title, Module, Priority P1-P3, Type, Status, Assignee)
+   - TeamMember: QA engineers, skills, availability (Available/Busy/On Leave), capacity (%)
+   - Report: Stored generated estimation and test audit reports
+   - EstimationHistory: Historical snapshots of calculations for sprint audit trail
+   - Notification: In-app user notifications and alerts
+   - SystemSetting: Configurable baseline rates and multipliers
+
+
+================================================================================
+3. CORE ESTIMATION ENGINE & MATHEMATICAL FORMULA
+================================================================================
+The estimation engine computes QA effort using four deterministic components:
+
+Formula:
+--------------------------------------------------------------------------------
+1. LOC Effort:
+   LOC Effort = (LOC / 1,000) * LOC_RATE
+   (Default LOC_RATE = 6.4 person-hours per 1,000 lines of code)
+
+2. Test Case Effort:
+   Test Case Effort = TestCases * TEST_CASE_RATE
+   (Default TEST_CASE_RATE = 0.1242 person-hours per test scenario (~7.5 minutes))
+
+3. Base Effort:
+   Base Effort = LOC Effort + Test Case Effort
+
+4. Coverage Multiplier:
+   Coverage Multiplier = 1 + ((TargetCoverage - 70) / 100)
+   (Baseline is 70% coverage. 85% coverage yields 1.15x multiplier)
+
+5. Complexity Multiplier:
+   - Low Complexity:    0.85x
+   - Medium Complexity: 1.00x
+   - High Complexity:   1.25x
+
+6. Environment Multiplier:
+   - 1 Environment:  1.00x
+   - 2 Environments: 1.10x
+   - 3 Environments: 1.20x
+
+7. Total Person-Hours:
+   Total Hours = Base Effort * CoverageMultiplier * ComplexityMultiplier * EnvMultiplier
+
+8. Sizing Conversions:
+   - Person-Days  = Total Hours / 8.0
+   - Person-Weeks = Person-Days / 5.0
+
+Effort Distribution Breakdown:
+------------------------------
+- Manual Functional Testing: ~42% of total hours
+- Automation Suite Dev & Run: ~28% of total hours
+- Defect Retesting & Verification: ~15% of total hours
+- Test Planning & Environment Setup: ~10% of total hours
+- Test Reporting & Sign-off: ~5% of total hours
+
+
+================================================================================
+4. COMPLETE APPLICATION WORKFLOW (PAGE-BY-PAGE)
+================================================================================
+
+1. Login / Sign Up Page:
+   - Split-screen enterprise layout.
+   - Allows new user registration with organization and role.
+   - Offers "1-Click Demo Login" for immediate access.
+
+2. Dashboard Page:
+   - 4 Live KPI Cards: Estimated QA Effort, Lines of Code, Test Cases, Target Coverage.
+   - Estimation Trend Area Chart: QA hours plotted against codebase volume.
+   - Effort Breakdown Donut Chart: 5-way activity distribution.
+   - Quick Estimation Panel: Rapid calculation sandbox with live update.
+   - Transparent Parameters Table: Shows mathematical weights and formula inputs.
+   - Architectural Complexity Analyzer: Detects scale factors and recommended team size.
+   - Audit Trail Table: Quick snapshot of past calculations.
+
+3. Estimation Calculator Page:
+   - Full-featured calculation workspace with real-time reactive calculations.
+   - Interactive sliders and inputs for LOC, Test Cases, Coverage, Complexity, Envs.
+   - Live Pie Chart & Bar Chart showing workload distribution.
+   - "Save Estimation Snapshot" button to persist calculation to database.
+   - "Export PDF" button to download immediate estimate report.
+
+4. Projects Page:
+   - Portfolio overview of all QA projects.
+   - Switchable Grid View and Table View.
+   - Filters by project type (Web, Mobile, Full Stack, API), complexity, and status.
+   - Quick actions: Duplicate Project, View Details, Generate Report, Delete.
+
+5. Project Details Page:
+   - Deep dive into an individual project's metrics and settings.
+   - Tabbed navigation: Overview, Test Suites, Team Allocation, Estimation History.
+
+6. Test Management Page:
+   - Quality metrics: Total, Passed, Failed, Blocked, Not Run, Automation Coverage (%).
+   - Filterable and searchable test case table.
+   - Interactive Status Switcher (change status instantly with live backend sync).
+   - "Add Test Case" modal for creating new scenarios.
+   - CSV Export & CSV Import for test cases.
+
+7. Reports Page:
+   - 4 Ready-to-use Report Templates:
+     * QA Estimation Summary Report
+     * Test Execution & Defect Status Report
+     * Coverage & Automation Readiness Report
+     * Team Capacity & Allocation Report
+   - Interactive Live Print-Ready Preview.
+   - One-Click Actions: "Download PDF", "Download Excel (.xlsx)", "Print".
+
+8. Team Management Page:
+   - QA Specialist roster cards and table.
+   - Specialist availability switcher: Available (Green), Busy (Amber), On Leave (Slate).
+   - Capacity gauge (0% - 100%).
+   - "Add Specialist" modal to onboard engineers and assign project responsibilities.
+
+9. History Page:
+   - Immutable audit trail of every saved calculation.
+   - Searchable by project name and filterable by complexity.
+   - "Load into Estimator" action to restore any historical snapshot into the calculator.
+
+10. Settings Page:
+    - Customization of estimation constants (LOC hourly rate, Test case rate, baseline coverage).
+    - Multipliers for Low/Medium/High complexity and Multi-environment scaling.
+    - Standard working hours per day and working days per week.
+
+11. Profile Page:
+    - User account management, designation, organization update, and password reset.
+
+
+================================================================================
+5. STEP-BY-STEP DETAILED TESTING GUIDE (WHAT TO DO FROM LOGIN TO REPORTS)
+================================================================================
+Follow this sequence to thoroughly test every feature from a clean slate:
+
+--------------------------------------------------------------------------------
+STEP 1: ACCESS THE APPLICATION & LOG IN
+--------------------------------------------------------------------------------
+1. Open your web browser and navigate to:
+   http://localhost:5173
+2. You will see the Login Screen.
+3. You have two options:
+   - OPTION A (Fastest): Click the blue "1-Click Login" button.
+     -> Logs in as QA Lead (ramesh@qaestimator.io / password123).
+   - OPTION B (Custom Account): Click "Sign Up" at the bottom.
+     -> Fill in Name (e.g., "Alex Smith"), Email, Password (min 6 chars),
+        Role ("QA Lead" or "SDET"), and Organization ("Acme QA Labs").
+     -> Click "Create Account".
+4. You will be redirected directly to the Dashboard.
+
+--------------------------------------------------------------------------------
+STEP 2: CREATE YOUR FIRST QA PROJECT
+--------------------------------------------------------------------------------
+Because all demo data was cleared, your portfolio starts completely clean.
+1. In the top navigation header or on the dashboard banner, click "+ New Project".
+2. A modal will pop up with project fields. Fill in:
+   - Project Name: "FinTech Mobile Banking 2.0"
+   - Project Type: Select "Mobile Application" (or Full Stack / API)
+   - Lines of Code (LOC): Enter 15000
+   - Test Cases Count: Enter 350
+   - Target Coverage (%): Enter 85
+   - Automation Coverage (%): Enter 40
+   - Architectural Complexity: Select "Medium"
+   - Target Environments: Select "2 Environments (Staging + Production)"
+   - External APIs: Enter 8
+   - Description: "Core retail banking app with biometric login and fund transfer."
+3. Click "Create Project".
+4. Result:
+   - The project is created in the database.
+   - The dashboard immediately refreshes, selecting this project as the active one.
+   - The 4 KPI cards, donut chart, and parameters table populate with calculated values!
+
+--------------------------------------------------------------------------------
+STEP 3: TEST THE QUICK ESTIMATOR ON THE DASHBOARD
+--------------------------------------------------------------------------------
+1. Scroll down on the Dashboard to the "Quick Estimation Panel" (left side).
+2. Change the inputs:
+   - Lines of Code: Change to 25000
+   - Test Cases: Change to 600
+   - Coverage: Change to 90%
+3. Click the blue "Calculate Estimate" button.
+4. Result:
+   - Notice the "Estimated QA Effort" box updates immediately to show the new person-hours
+     and approximate working days.
+   - The Transparent Parameters Table on the right dynamically reflects the new inputs.
+5. Click "Save as Estimation Snapshot" below the table.
+   - A green confirmation banner "Estimate successfully saved to project history!" will appear.
+   - The "Historical Estimates" table at the bottom of the dashboard now shows this record!
+
+--------------------------------------------------------------------------------
+STEP 4: EXPLORE THE FULL ESTIMATION CALCULATOR
+--------------------------------------------------------------------------------
+1. Click "Estimator" in the top navigation bar.
+2. Notice all calculation sliders and controls:
+   - Adjust the "Lines of Code (LOC)" slider between 1,000 and 50,000.
+   - Adjust the "Test Case Count" slider.
+   - Adjust the "Target Coverage" slider (notice how pushing beyond 70% scales the hours).
+   - Toggle Complexity between "Low" (0.85x), "Medium" (1.00x), and "High" (1.25x).
+   - Toggle Environments (1, 2, or 3).
+3. Observe real-time reactivity:
+   - The Total Person-Hours counter animates with every slider movement.
+   - The Workload Breakdown Pie Chart updates (Manual, Automation, Retest, Planning, Report).
+   - The Team Sizing Recommendation updates (e.g. 1 Lead, 2 Engineers, 1 SDET).
+4. Click "Save Snapshot" to record this calculation run to the database audit trail.
+5. Click "Export PDF" -> A formal PDF calculation summary document will download to your machine.
+
+--------------------------------------------------------------------------------
+STEP 5: TEST CASE MANAGEMENT (ADD, UPDATE STATUS, FILTER, EXPORT)
+--------------------------------------------------------------------------------
+1. Click "Test Management" in the navigation bar.
+2. Currently, there are 0 test cases. Let's add test scenarios:
+   - Click the "+ Add Test Case" button in the top right.
+   - Fill in:
+     * Test Case ID: "TC-101"
+     * Title: "Verify user biometric fingerprint authentication on iOS"
+     * Module: "Authentication"
+     * Priority: "P1"
+     * Type: "Automated"
+     * Status: "Passed"
+     * Assigned To: "Sarah Connor"
+   - Click "Save Test Case".
+3. Add a second test case:
+   - Click "+ Add Test Case" again.
+   - Test Case ID: "TC-102"
+   - Title: "Verify account balance refresh on network reconnection"
+   - Module: "Wallet"
+   - Priority: "P2"
+   - Type: "Manual"
+   - Status: "Failed"
+   - Assigned To: "John Doe"
+   - Click "Save Test Case".
+4. Test Status Switching:
+   - In the table, click the status dropdown next to TC-102 (currently "Failed").
+   - Change it to "Passed".
+   - Notice the status updates instantly and the KPI card "Pass Rate" recalculates!
+5. Test Filtering & Search:
+   - Type "biometric" in the search box -> Only TC-101 is shown.
+   - Clear search.
+   - Change Priority filter to "P1" -> Only TC-101 is shown.
+6. Test CSV Export:
+   - Click the "Export CSV" button -> A `.csv` file containing all test cases will download.
+
+--------------------------------------------------------------------------------
+STEP 6: QA TEAM ROSTER & CAPACITY MANAGEMENT
+--------------------------------------------------------------------------------
+1. Click "Team" in the navigation bar.
+2. Notice the empty state message: "No QA Specialists Added".
+3. Click "+ Add Specialist" in the top right.
+4. Fill in the modal:
+   - Full Name: "Elena Rostova"
+   - Role: "QA Lead"
+   - Experience Level: "7+ Years"
+   - Availability: "Available"
+   - Work Capacity (%): 100
+   - Email: "elena@acmeqa.io"
+   - Phone: "+1 (555) 432-1098"
+   - Assigned Projects: "FinTech Mobile Banking"
+5. Click "Add Team Member".
+6. Repeat for a second engineer:
+   - Full Name: "Marcus Vance", Role: "Automation Engineer", Availability: "Busy", Capacity: 80.
+7. Observe the Team page:
+   - Total Specialists counter updates to 2.
+   - Availability gauges display availability percentages.
+   - In the table, toggle Elena's availability dropdown from "Available" to "Busy" -> saves to DB.
+
+--------------------------------------------------------------------------------
+STEP 7: GENERATE FORMAL REPORTS (PDF & EXCEL EXPORT)
+--------------------------------------------------------------------------------
+1. Click "Reports" in the navigation bar.
+2. Four report template cards will be displayed:
+   - Estimation Summary Report
+   - Project QA Report
+   - Coverage & Automation Report
+   - Team Utilization Report
+3. Click on the "Estimation Summary Report" card.
+4. A full preview document renders on screen displaying:
+   - Executive Summary
+   - Scope & Methodology
+   - Effort Distribution & Formula Parameters
+   - Team Allocation & Milestones
+5. Test File Downloads:
+   - Click "Download PDF" (top right) -> Generates a formatted PDF file.
+   - Click "Download Excel" -> Generates a structured `.xlsx` spreadsheet.
+   - Click "Print" -> Opens browser print dialog for paper or PDF printer.
+
+--------------------------------------------------------------------------------
+STEP 8: AUDIT TRAIL & RELOADING PAST ESTIMATES
+--------------------------------------------------------------------------------
+1. Click "History" in the navigation bar.
+2. You will see the historical snapshots you saved in Step 3 and Step 4!
+3. Click on any historical row or the "Load into Estimator" arrow button.
+4. Result:
+   - The calculator immediately opens with the exact LOC, test cases, coverage,
+     and multipliers from that historical run restored!
+
+--------------------------------------------------------------------------------
+STEP 9: PROJECT PORTFOLIO MANAGEMENT (DUPLICATE & DELETE)
+--------------------------------------------------------------------------------
+1. Click "Projects" in the navigation bar.
+2. You will see your "FinTech Mobile Banking 2.0" card.
+3. Switch views:
+   - Click the "Table" icon in the top right to view in tabular mode.
+   - Click the "Grid" icon to switch back to card mode.
+4. Test Duplication:
+   - Click the "Copy" icon on the project card.
+   - A duplicated project named "FinTech Mobile Banking 2.0 (Copy)" will appear.
+5. Test Deletion:
+   - Click the "Trash" icon on the copied project.
+   - Confirm deletion in the prompt -> The duplicate is cleanly removed.
+
+--------------------------------------------------------------------------------
+STEP 10: CONFIGURE SYSTEM SETTINGS
+--------------------------------------------------------------------------------
+1. Click "Settings" in the navigation bar.
+2. Here you can customize the engine's constants:
+   - Change "Hours per 1,000 LOC" from 6.4 to 7.0.
+   - Change "Baseline Coverage" from 70% to 75%.
+3. Click "Save Settings".
+4. All future calculations will now use your custom baseline parameters!
+
+--------------------------------------------------------------------------------
+STEP 11: USER PROFILE & LOGOUT
+--------------------------------------------------------------------------------
+1. Click "Profile" in the navigation bar.
+2. Update your Job Title, Organization name, or Phone Number.
+3. Click "Save Changes" -> Your name in the top header updates immediately.
+4. In the top right header, click the "Logout" icon.
+5. You will be returned to the Login screen with all session tokens cleared.
+
+
+================================================================================
+6. USEFUL COMMANDS & TROUBLESHOOTING
+================================================================================
+If you need to manage the application via terminal:
+
+1. Start both Frontend & Backend concurrently:
+   npm run dev
+
+2. Start Backend API only (Port 5000):
+   npm run dev:server
+
+3. Start Frontend Client only (Port 5173):
+   npm run dev:client
+
+4. Reset / Clear all demo data again at any time:
+   npm run db:clear
+
+5. Re-seed demo project (152 hrs E-Commerce benchmark):
+   npm run db:seed
+
+6. Check Backend API health:
+   curl http://localhost:5000/api/health
+
+================================================================================
+END OF FLOW & TESTING GUIDE
+================================================================================
